@@ -5,6 +5,7 @@ import os
 from dotenv import load_dotenv
 import csv
 load_dotenv() # Loads .env variables
+from inhouse import *
 
 ### Setup SQL
 import mysql.connector
@@ -63,6 +64,8 @@ test_users = [
     # ("Manì", 0, 'ADC', None, False, 1000, 0)
 ]
 
-with connection.cursor() as cursor:
-    cursor.executemany(user_insert_query, test_users)
-    connection.commit()
+# with connection.cursor() as cursor:
+#     cursor.executemany(user_insert_query, test_users)
+#     connection.commit()
+
+lookup_by_ign("TauPiPhi")
