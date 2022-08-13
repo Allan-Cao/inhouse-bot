@@ -1,2 +1,3 @@
-discord-py-interactions
+py-cord
+python-dotenv
 cassiopeia
