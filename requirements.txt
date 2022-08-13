@@ -1,3 +1,4 @@
 py-cord
 python-dotenv
 cassiopeia
+mysql-connector-python

@@ -4,7 +4,6 @@ import os
 from dotenv import load_dotenv
 import mysql.connector
 from mysql.connector import Error
-from pandas import describe_option
 load_dotenv() # Loads .env variables
 import cassiopeia as cass
 from inhouse import *
@@ -26,32 +25,36 @@ async def on_ready():
         status=discord.Status.online,
         activity=discord.Game("Managing Inhouse Queues"))
 
-@bot.slash_command(name = "register", description = "Link your discord with already registered summoner")
-async def register(ctx):
-    await ctx.respond("Hey!")
-    #summoner = cass.get_summoner(name="Perkz", region="NA")
-
-# @bot.command(
-#     name="link",
-#     brief="Links discord account with a solo queue account",
-# )
-# async def link(ctx, *args):
-
-@bot.command(
-    name="lobby",
-    brief="Creates lobby",
-)
-async def lobby(ctx):
-    embed = generate_queue()
-    await ctx.respond("Hello! Here's a cool embed.", embed=embed) # Send the embed with some text
+############################################# User Registration ##########################################################
+@bot.slash_command(name = "link", description = "Link your discord with an already registered summoner")
+async def register(ctx, ign: str):
+    discord_id = ctx.user.id
+    user_register = lookup_by_discord_id(discord_id)
+    if user_register != None:
+        await ctx.respond(f"Your discord account is already connected to the IGN {user_register[0]}. If this is an error, please contact a moderator.") # NEEDS TO TEST
+        return
+    else:
+        player_lookup = lookup_by_ign(ign)
+        if player_lookup == None:
+            await ctx.respond(f"The IGN {ign} is not in the system yet. Please contact a moderator if you think this is an error.")
+        else:
+            update_discord_id(discord_id, ign)
+            await ctx.respond(f"Your discord account has been linked to the IGN {ign}")
+################################################# Queue System ##############################################################
+@bot.slash_command(name = "queue", description = "Joins the queue")
+async def queue(ctx, role: discord.selectMenu(options=["Top","Jungle","Mid","ADC","Support","Fill"])):
+    await ctx.respond(role)
 
 @bot.slash_command(name = "search", description = "Lookup user")
 async def search(ctx: discord.ApplicationContext, ign: str):
-    embed = lookup_by_ign(ign)
-    if embed == None:
+    player_info = lookup_by_ign(ign)
+    if player_info == None:
         await ctx.respond(f"User with the IGN {ign} could not be found")
         return
-    await ctx.respond("Ah found them! Here's their information", embed=embed)
+    else:
+        embed = format_playercard_embed(player_info)
+        await ctx.respond(embed=embed)
+
 @bot.slash_command(name = "stop")
 async def stop(ctx):
     stop_sql()
@@ -70,5 +73,7 @@ async def feedback(ctx: discord.ApplicationContext, name: str):
         await ctx.send(f"Thanks for the feedback!\nReceived feedback: `{feedback_message.content}`")
     except asyncio.TimeoutError:
         await ctx.send("Timed out, please try again!")
+
+############################## ADMIN COMMANDS ############################## 
 
 bot.run(os.getenv('SERA_TOKEN'))

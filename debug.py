@@ -25,29 +25,24 @@ except Error as e:
 
 # Create Initial Database
 
-# cursor.execute("""CREATE TABLE users (
-#     ign TEXT,
-#     id BIGINT,
-#     main_role ENUM('Top','Jungle','Mid','ADC','Support'),
-#     secondary_role ENUM('Top','Jungle','Mid','ADC','Support'),
-#     fill_queue BOOLEAN,
-#     elo INTEGER,
-#     timeout INTEGER)
-# """)
+cursor.execute("""CREATE TABLE users (
+    ign TEXT,
+    id BIGINT,
+    main_role ENUM('Top','Jungle','Mid','ADC','Support'),
+    secondary_role ENUM('Top','Jungle','Mid','ADC','Support'),
+    fill_queue BOOLEAN,
+    elo FLOAT(1),
+    timeout INTEGER)
+""")
 
-# Roles: Top, Jungle, Mid, ADC, Support => 0,1,2,3,4
+users = []
 
-# file1 = open('role_signup.csv', newline='',encoding="utf-8")
-# csvreader = csv.reader(file1)
-# header = next(csvreader)
-# for row in csvreader:
-
-# file2 = open('playerbase.csv', newline='',encoding="utf-8")
-# csvreader = csv.reader(file2)
-# header = next(csvreader)
-# for row in csvreader:
-#     if row[0] != "":
-#         print(row)
+player_csv = open('players.csv', newline='',encoding="utf-8")
+csvreader = csv.reader(player_csv)
+header = next(csvreader)
+for row in csvreader:
+    if row[0] != "":
+        users.append((row[0], 0, row[2], None, False, row[3], 0))
 
 ### Test Users
 
@@ -57,6 +52,7 @@ INSERT INTO users
 VALUES ( %s, %s, %s, %s, %s, %s, %s )
 """
 
+
 test_users = [
 #    ("TauPiPhi", 645940845245104130, 'Support', None, False, 1000, 0),
 #    ("DravenMain1", 0, 'ADC', None, False, 1000, 0),
@@ -64,8 +60,9 @@ test_users = [
     # ("Manì", 0, 'ADC', None, False, 1000, 0)
 ]
 
-# with connection.cursor() as cursor:
-#     cursor.executemany(user_insert_query, test_users)
-#     connection.commit()
 
-lookup_by_ign("TauPiPhi")
+with connection.cursor() as cursor:
+    cursor.executemany(user_insert_query, users)
+    connection.commit()
+
+# lookup_by_ign("TauPiPhi")
