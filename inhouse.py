@@ -1,4 +1,28 @@
 import discord
+import os
+### SQL Queries ###
+user_insert_query = """
+INSERT INTO users
+(ign, id, main_role, secondary_role, fill_queue, elo, timeout)
+VALUES ( %s, %s, %s, %s, %s, %s, %s )
+"""
+
+### Setup SQL
+import mysql.connector
+from mysql.connector import Error
+
+try:
+    connection = mysql.connector.connect(host=os.getenv('SQL_URL'),
+                                         database='inhouse', #CREATE DATABASE inhouse
+                                         user=os.getenv('SQL_USER'),
+                                         password=os.getenv('SQL_PWD'))
+    if connection.is_connected():
+        db_Info = connection.get_server_info()
+        print("Connected to MySQL Server version ", db_Info)
+        cursor = connection.cursor()
+except Error as e:
+    print("Error while connecting to MySQL", e)
+
 
 def generate_queue():
     embed = discord.Embed(
@@ -19,3 +43,8 @@ def generate_queue():
     #embed.set_thumbnail(url="https://example.com/link-to-my-thumbnail.png")
     #embed.set_image(url="https://example.com/link-to-my-banner.png")
     return embed
+
+def add_user(user):
+    with connection.cursor() as cursor:
+        cursor.executemany(user_insert_query, user)
+        connection.commit()

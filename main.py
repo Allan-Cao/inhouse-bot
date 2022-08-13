@@ -1,15 +1,13 @@
 import discord
 import os
 from dotenv import load_dotenv
-import sqlite3
+import mysql.connector
+from mysql.connector import Error
 load_dotenv() # Loads .env variables
 import cassiopeia as cass
 from inhouse import *
 
-### Setup SQL (sqlite3 for now but could use something better in the future)
-DATABASE_FILE = os.getenv('DB_FILE')
-connection = sqlite3.connect(DATABASE_FILE, isolation_level=None)
-cursor = connection.cursor()
+### Note that all SQL queries will be handled in the inhouse.py file
 
 ### Setup Discord Bot
 #intents = discord.Intents.default()
