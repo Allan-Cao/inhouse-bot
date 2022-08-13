@@ -1,3 +1,4 @@
+from turtle import update
 import discord
 import os
 import datetime
@@ -9,8 +10,10 @@ INSERT INTO users
 VALUES ( %s, %s, %s, %s, %s, %s, %s )
 """
 ign_lookup_query = "SELECT * FROM users WHERE ign = %s"
-discord_id_lookup_query = "SELECT * FROM users WHERE id = %s"
+id_lookup_query = "SELECT * FROM users WHERE id = %s"
 update_discord_id_query = "UPDATE users SET id = %s WHERE ign = %s"
+update_discord_id_query = "UPDATE users SET id = %s WHERE ign = %s"
+update_secondary_role_by_id = "UPDATE users SET secondary_role = %s WHERE id = %s"
 
 ### Setup SQL
 import mysql.connector
@@ -27,15 +30,17 @@ try:
         cursor = connection.cursor()
 except Error as e:
     print("Error while connecting to MySQL", e)
-
-def lookup_by_discord_id(id):
-    with connection.cursor() as cursor:
-        cursor.execute(discord_id_lookup_query, (id,))
-        myresult = cursor.fetchone()
-    if myresult == None:
-        return None
-    else:
-        return(myresult)
+def update_elo(id, elo_update):
+    player_info = lookup_by_id(id)
+    current_elo = player_info[5]
+    updated_elo = current_elo + elo_update
+    if updated_elo <= 600:
+        return True
+    if updated_elo >= 1500:
+        return "Fill"
+    elif updated_elo >= 1250:
+        return "Secondary Role" 
+    
 def generate_queue():
     embed = discord.Embed(
         title="Queue Test",
@@ -68,6 +73,19 @@ def lookup_by_ign(ign):
         return None
     else:
         return(myresult)
+def change_secondary_role(new_role, id):
+    with connection.cursor() as cursor:
+        cursor.execute(update_secondary_role_by_id, (new_role, id,))
+        connection.commit()
+def lookup_by_id(id):
+    with connection.cursor() as cursor:
+        cursor.execute(id_lookup_query, (id,))
+        myresult = cursor.fetchone()
+    if myresult == None:
+        return None
+    else:
+        return(myresult)
+
 def update_discord_id(id, ign):
     with connection.cursor() as cursor:
         cursor.execute(update_discord_id_query, (id, ign,))
