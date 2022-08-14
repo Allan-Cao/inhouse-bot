@@ -50,7 +50,9 @@ def queue_is_open():
     #     return True
     # else:
     #     return False
-def check_lobby_made():
+def add_to_ready_check():
+    ...
+def check_lobby_made(ctx):
     with connection.cursor() as cursor:
         lobby_users = []
         for role in ["Top", "Jungle", "Mid", "ADC", "Support"]:
@@ -61,6 +63,8 @@ def check_lobby_made():
             else:
                 lobby_users.append([player[:5] for player in myresult[0:2]])
     print(lobby_users)
+    for player in lobby_users:
+        ...
     return True
 def remove_from_queue_id(id):
     with connection.cursor() as cursor:
