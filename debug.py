@@ -25,33 +25,31 @@ except Error as e:
 
 # Create Initial Database
 
-cursor.execute("""CREATE TABLE users (
+# cursor.execute("""CREATE TABLE queue (
+#     ign TEXT,
+#     id BIGINT,
+#     primary_queue ENUM('Top','Jungle','Mid','ADC','Support', 'Fill'),
+#     secondary_role ENUM('Top','Jungle','Mid','ADC','Support'),
+#     elo FLOAT(1),
+#     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)
+# """)
+
+# ### Test Users
+
+# user_insert_query = """
+# INSERT INTO users
+# (ign, id, main_role, secondary_role, fill_queue, elo, timeout)
+# VALUES ( %s, %s, %s, %s, %s, %s, %s )
+# """
+
+cursor.execute("""CREATE TABLE ready_check (
     ign TEXT,
     id BIGINT,
-    main_role ENUM('Top','Jungle','Mid','ADC','Support'),
-    secondary_role ENUM('Top','Jungle','Mid','ADC','Support'),
-    fill_queue BOOLEAN,
+    role ENUM('Top','Jungle','Mid','ADC','Support'),
     elo FLOAT(1),
-    timeout INTEGER)
+    game_id INT,
+    status BOOLEAN)
 """)
-
-users = []
-
-player_csv = open('players.csv', newline='',encoding="utf-8")
-csvreader = csv.reader(player_csv)
-header = next(csvreader)
-for row in csvreader:
-    if row[0] != "":
-        users.append((row[0], 0, row[2], None, False, row[3], 0))
-
-### Test Users
-
-user_insert_query = """
-INSERT INTO users
-(ign, id, main_role, secondary_role, fill_queue, elo, timeout)
-VALUES ( %s, %s, %s, %s, %s, %s, %s )
-"""
-
 
 test_users = [
 #    ("TauPiPhi", 645940845245104130, 'Support', None, False, 1000, 0),
@@ -61,8 +59,8 @@ test_users = [
 ]
 
 
-with connection.cursor() as cursor:
-    cursor.executemany(user_insert_query, users)
-    connection.commit()
+# with connection.cursor() as cursor:
+#     cursor.executemany(user_insert_query, users)
+#     connection.commit()
 
 # lookup_by_ign("TauPiPhi")

@@ -8,8 +8,6 @@ load_dotenv() # Loads .env variables
 import cassiopeia as cass
 from inhouse import *
 
-### Note that all SQL queries will be handled in the inhouse.py file
-
 ### Setup Discord Bot
 intents = discord.Intents.default()
 bot = discord.Bot(debug_guilds=[821109702162907158], intents=intents)# Most functions require intents (will require discord approval at 100 members)
@@ -26,6 +24,13 @@ cass.set_riot_api_key(RIOT_API)
 # support = discord.SelectOption(label="Support",value="Support")
 # role_select = discord.SelectMenu(1,1,[top,jungle,mid,adc,support])
 global_roles = ["top","jungle","mid","support","adc"]
+sql_role_map = {
+    "top": "Top",
+    "jungle": "Jungle",
+    "mid": "Mid",
+    "adc": "ADC",
+    "support": "Support"
+}
 
 @bot.event
 async def on_ready():
@@ -52,19 +57,6 @@ async def register(ctx, ign: str):
             update_discord_id(discord_id, ign)
             await ctx.respond(f"Your discord account has been linked to the IGN {ign}")
 
-class MyView(discord.ui.View):
-    async def on_timeout(self):
-        for child in self.children:
-            child.disabled = True
-        await self.message.edit(content="Timed-out editing secondary role.", view=self)
-    @discord.ui.button(label="Confirm", row=0, style=discord.ButtonStyle.primary)
-    async def first_button_callback(self, secondary, interaction):
-        await interaction.response.send_message("You pressed me!")
-
-    @discord.ui.button(label="Cancel", row=1, style=discord.ButtonStyle.primary)
-    async def second_button_callback(self, secondary, interaction):
-        await interaction.response.send_message("Canceled")
-
 @registration.command(name = "secondary", description = "Set a secondary role")
 async def secondary(ctx, role: str):
     if role.lower() not in global_roles:
@@ -76,33 +68,48 @@ async def secondary(ctx, role: str):
         await ctx.respond(f"Your discord account is not linked to any account. Please register yourself into the system before running this command.")
         return
     else:
-        role = role.capitalize()
+        role = sql_role_map[role.lower()]
         if role == player_info[2]:
             await ctx.respond("Your secondary role must be different from your primary role.")
             return
         elif role == player_info[3]:
             await ctx.respond(f"Your secondary role is already {player_info[3]}.")
         elif player_info[3] != None:
-            await ctx.respond(f"Confirm that you want to switch your secondary role from {player_info[2]} to {role}", view=MyView(timeout=30))
+            change_secondary_role(role,discord_id)
+            await ctx.respond(f"Your secondary role has been changed from {player_info[2]} to {role}")
         else:
             change_secondary_role(role,discord_id)
             await ctx.respond("Secondary role has been changed!")
             
 ################################################# Queue System ##############################################################
 queue_system = bot.create_group("queue", "Inhouse queue system")
-
+@queue_system.command(name = "info", description = "Current Queue")
+async def info(ctx: discord.ApplicationContext):
+    embed = generate_queue_embed()
+    await ctx.respond(embed=embed)
 @queue_system.command(name = "join", description = "Joins the queue")
 async def join(ctx):
-  await ctx.respond(f"Hello, {ctx.author}!")
+    discord_id = ctx.user.id
+    player_info = lookup_queue_id(discord_id)
+    if player_info != None:
+        await ctx.respond("You are currently in queue")
+        return
+    else:
+        join_queue_id(discord_id)
+        await ctx.respond("You have been added to the queue!")
+        if check_lobby_made(ctx):
+            print("Lobby found?")
 
 @queue_system.command(name = "leave", description = "Leaves the queue")
 async def leave(ctx):
-  await ctx.respond(f"Bye, {ctx.author}!")
-  await ctx.respond("You have left the queue!")
+    discord_id = ctx.user.id
+    remove_from_queue_id(discord_id)
+    await ctx.respond("You have been removed from the queue.")
 
 @bot.slash_command(name = "profile", description = "Your profile")
 async def profile(ctx: discord.ApplicationContext):
-    player_info = lookup_by_id(ctx.author.id)
+    discord_id = ctx.user.id
+    player_info = lookup_by_id(discord_id)
     if player_info == None:
         await ctx.respond(f"Your user profile could not be found. Are you sure you are registered?")
         return
@@ -119,7 +126,16 @@ async def search(ctx: discord.ApplicationContext, ign: str):
     else:
         embed = format_playercard_embed(player_info)
         await ctx.respond(embed=embed)
+############################## READY CHECK COMMANDS ############################## 
+
 
 ############################## ADMIN COMMANDS ############################## 
+
+# reset_system = bot.create_group("reset", "Admin reset commands")
+
+# @reset_system.command(name = "queue", description = "Resets the queue (removes everyone from the queue)")
+# async def queue(ctx: discord.ApplicationContext):
+#     reset_queue()
+#     await ctx.respond("Queue has been reset")
 
 bot.run(os.getenv('SERA_TOKEN'))
