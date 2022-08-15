@@ -11,6 +11,7 @@ sql_role_map = {
     "mid": "Mid",
     "adc": "ADC",
     "support": "Support",
+    "": None
 }
 
 def ping_user_by_id(id, ign):

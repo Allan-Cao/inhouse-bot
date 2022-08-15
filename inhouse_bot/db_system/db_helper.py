@@ -27,8 +27,8 @@ update_in_ready_check_query = "UPDATE queue SET in_ready_check = %s WHERE id = %
 update_readyd_query = "UPDATE queue SET ready_check = %s WHERE id = %s"
 queue_insert_query = """
 INSERT INTO queue
-(ign, id, primary_role, secondary_role, elo, in_ready_check, ready_check)
-VALUES ( %s, %s, %s, %s, %s, False, False)
+(ign, id, primary_role, secondary_role, elo, in_ready_check, ready_check, ready_check_id)
+VALUES ( %s, %s, %s, %s, %s, False, Null, Null)
 """
 get_current_queue_query = "SELECT * FROM queue"
 get_primary_queue_query = "SELECT * FROM queue WHERE primary_role = %s"
@@ -82,7 +82,7 @@ def lookup_queue_id(id):
     return myresult
 def add_user(user):
     with connection.cursor() as cursor:
-        cursor.executemany(user_insert_query, user)
+        cursor.execute(user_insert_query, user)
         connection.commit()
 def lookup_by_ign(ign):
     with connection.cursor() as cursor:

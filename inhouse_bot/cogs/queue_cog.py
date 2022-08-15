@@ -105,7 +105,7 @@ class queue_cog(commands.Cog):
                 myresult = cursor.fetchall()
             player_list = ""
             for player in myresult:
-                ign, player_id, primary, secondary, elo, created_at = player
+                ign, player_id, primary, secondary, elo, in_ready_check, ready_check, created_at, ready_check_id = player
                 if primary == role:
                     player_list += ping_user_by_id(player_id, ign) + ","
                 elif secondary == role:
