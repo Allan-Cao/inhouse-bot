@@ -4,21 +4,18 @@
 import os
 from dotenv import load_dotenv
 import csv
-
-load_dotenv()  # Loads .env variables
-from inhouse import *
+load_dotenv() # Loads .env variables
+from inhouse_bot.inhouse import *
 
 ### Setup SQL
 import mysql.connector
 from mysql.connector import Error
 
 try:
-    connection = mysql.connector.connect(
-        host=os.getenv("SQL_URL"),
-        database="inhouse",  # CREATE DATABASE inhouse
-        user=os.getenv("SQL_USER"),
-        password=os.getenv("SQL_PWD"),
-    )
+    connection = mysql.connector.connect(host=os.getenv('SQL_URL'),
+                                         database='inhouse', #CREATE DATABASE inhouse
+                                         user=os.getenv('SQL_USER'),
+                                         password=os.getenv('SQL_PWD'))
     if connection.is_connected():
         db_Info = connection.get_server_info()
         print("Connected to MySQL Server version ", db_Info)
@@ -45,21 +42,19 @@ except Error as e:
 # VALUES ( %s, %s, %s, %s, %s, %s, %s )
 # """
 
-cursor.execute(
-    """CREATE TABLE ready_check (
+cursor.execute("""CREATE TABLE ready_check (
     ign TEXT,
     id BIGINT,
     role ENUM('Top','Jungle','Mid','ADC','Support'),
     elo FLOAT(1),
     game_id INT,
     status BOOLEAN)
-"""
-)
+""")
 
 test_users = [
-    #    ("TauPiPhi", 645940845245104130, 'Support', None, False, 1000, 0),
-    #    ("DravenMain1", 0, 'ADC', None, False, 1000, 0),
-    #    ("Âzîr", 0, 'Mid', None, False, 1000, 0)
+#    ("TauPiPhi", 645940845245104130, 'Support', None, False, 1000, 0),
+#    ("DravenMain1", 0, 'ADC', None, False, 1000, 0),
+#    ("Âzîr", 0, 'Mid', None, False, 1000, 0)
     # ("Manì", 0, 'ADC', None, False, 1000, 0)
 ]
 
