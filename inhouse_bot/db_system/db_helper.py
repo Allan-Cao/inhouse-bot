@@ -15,7 +15,6 @@ VALUES ( %s, %s, %s, %s, %s, %s)
 ign_lookup_query = "SELECT * FROM users WHERE ign = %s"
 id_lookup_query = "SELECT * FROM users WHERE id = %s"
 update_discord_id_query = "UPDATE users SET id = %s WHERE ign = %s"
-update_discord_id_query = "UPDATE users SET id = %s WHERE ign = %s"
 update_secondary_role_by_id = "UPDATE users SET secondary_role = %s WHERE id = %s"
 
 queue_lookup_ign_query = "SELECT * FROM queue WHERE id = %s"
@@ -24,13 +23,17 @@ remove_from_queue_id_query = "DELETE FROM queue WHERE id = %s"
 remove_from_queue_ign_query = "DELETE FROM queue WHERE ign = %s"
 reset_queue_query = "DELETE FROM queue;"
 queue_row_count_query = "SELECT COUNT(1) FROM queue;"
+update_in_ready_check_query = "UPDATE queue SET in_ready_check = %s WHERE id = %s"
+update_readyd_query = "UPDATE queue SET ready_check = %s WHERE id = %s"
 queue_insert_query = """
 INSERT INTO queue
-(ign, id, primary_queue, secondary_role, elo)
-VALUES ( %s, %s, %s, %s, %s)
+(ign, id, primary_role, secondary_role, elo, in_ready_check, ready_check)
+VALUES ( %s, %s, %s, %s, %s, False, False)
 """
-get_role_queue_query = "SELECT * FROM queue WHERE primary_queue = %s OR secondary_role = %s"
-get_role_sorted_query = "SELECT * from queue WHERE primary_queue = %s ORDER BY created_at;"
+get_current_queue_query = "SELECT * FROM queue"
+get_primary_queue_query = "SELECT * FROM queue WHERE primary_role = %s"
+get_role_queue_query = "SELECT * FROM queue WHERE primary_role = %s OR secondary_role = %s"
+get_role_sorted_query = "SELECT * from queue WHERE primary_role = %s ORDER BY created_at;"
 
 ### Setup SQL
 import mysql.connector
@@ -76,8 +79,6 @@ def lookup_queue_id(id):
         cursor.execute(queue_lookup_id_query, (id,))
         myresult = cursor.fetchone()
     return myresult
-
-
 def add_user(user):
     with connection.cursor() as cursor:
         cursor.executemany(user_insert_query, user)
@@ -118,4 +119,16 @@ def update_elo(id, elo_update):
     if updated_elo >= 1500:
         return "Fill"
     elif updated_elo >= 1250:
-        return "Secondary Role" 
+        return "Secondary Role"
+def get_current_queue():
+    with connection.cursor() as cursor:
+        cursor.execute(get_current_queue_query)
+        return cursor.fetchall()
+def update_in_ready_check(in_ready_check, id):
+    with connection.cursor() as cursor:
+        cursor.execute(update_in_ready_check_query, (in_ready_check, id))
+        connection.commit()
+def update_readyd_queue(ready_check, id):
+    with connection.cursor() as cursor:
+        cursor.execute(update_readyd_query, (ready_check, id))
+        connection.commit()

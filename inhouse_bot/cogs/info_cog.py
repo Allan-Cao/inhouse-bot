@@ -8,7 +8,7 @@ class info_cog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    def format_playercard_embed(player_information):
+    def format_playercard_embed(self, player_information):
         name, discord_id, primary_role, second_role, elo, timeout = player_information
         embed = discord.Embed(
             title=f"{name} Player Data",
@@ -18,7 +18,7 @@ class info_cog(commands.Cog):
         embed.add_field(name="Primary Role", value=primary_role, inline=True)
         embed.add_field(name="Secondary Role", value=second_role, inline=True)
 
-        embed.add_field(name="Able to queue fill?", value=can_fill, inline=True)
+        embed.add_field(name="Able to queue fill?", value=can_fill(elo), inline=True)
         if discord_id == 0:
             linked_account = "Not linked"
         else:

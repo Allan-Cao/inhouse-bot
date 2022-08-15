@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from inhouse_bot.db_system.db_helper import reset_queue, lookup_by_ign, lookup_by_id, add_user
 from inhouse_bot.utils.formatter import sql_role_map, secondary_roles_lowercase, all_roles_lowercase
+from discord.commands import Option
 
 class admin_cog(commands.Cog):
     def __init__(
@@ -20,14 +21,19 @@ class admin_cog(commands.Cog):
     @discord.slash_command(
         name="add", description="Adds a new player into the system!"
     )
-    async def add(self, ctx, ign: str, member: discord.Member, primary_role: str, secondary_role: str, elo: int):
-        discord_id = member.id
+    async def add(
+        self, ctx, ign: str, primary_role: str, elo: float,  secondary_role: Option(str, "Optional Secondary Role", required = False, default=''),   discord_id: Option(str, "Discord account id", required = False, default='0')):
         ### Check Inputs ##
-        if lookup_by_id(discord_id) != None:
-            await ctx.respond("That discord user is already registered!")
+        if discord_id != "":
+            try:
+                discord_id = int(discord_id)
+            except:
+                await ctx.respond("Unknown Discord ID receieved")
+            if lookup_by_id(discord_id) != None:
+                await ctx.respond("That discord user is already registered!")
         if lookup_by_ign(ign) != None:
             await ctx.respond("That IGN has already been registered")
-        elif ((primary_role.lower() not in all_roles_lowercase) or (secondary_role.lower() not in secondary_roles_lowercase)):
+        elif ((primary_role.lower() not in all_roles_lowercase) or ((secondary_role.lower() not in secondary_roles_lowercase) and secondary_role != "")):
             await ctx.respond("Unknown role receieved.")
         else:
             primary_role = sql_role_map[primary_role.lower()]
