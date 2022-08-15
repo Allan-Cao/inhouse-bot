@@ -34,7 +34,8 @@ get_current_queue_query = "SELECT * FROM queue"
 get_primary_queue_query = "SELECT * FROM queue WHERE primary_role = %s"
 get_role_queue_query = "SELECT * FROM queue WHERE primary_role = %s OR secondary_role = %s"
 get_role_sorted_query = "SELECT * from queue WHERE primary_role = %s ORDER BY created_at;"
-
+reset_ready_check_id_query = "UPDATE queue SET ready_check = None WHERE ready_check_id = %s"
+update_ready_check_id_query = "UPDATE queue SET ready_check_id = %s WHERE id = %s"
 ### Setup SQL
 import mysql.connector
 from mysql.connector import Error
@@ -131,4 +132,12 @@ def update_in_ready_check(in_ready_check, id):
 def update_readyd_queue(ready_check, id):
     with connection.cursor() as cursor:
         cursor.execute(update_readyd_query, (ready_check, id))
+        connection.commit()
+def update_ready_check_id(ready_check_id, id):
+    with connection.cursor() as cursor:
+        cursor.execute(update_ready_check_id_query, (ready_check_id, id))
+        connection.commit()
+def reset_ready_check_id(ready_check_id):
+    with connection.cursor() as cursor:
+        cursor.execute(reset_ready_check_id_query, (ready_check_id))
         connection.commit()
