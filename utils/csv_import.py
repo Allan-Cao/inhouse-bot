@@ -7,7 +7,7 @@
 # Required Imports
 import os
 from dotenv import load_dotenv
-load_dotenv() # Loads .env variables
+load_dotenv("../inhouse_bot/.env") # Loads .env variables
 import csv
 
 ### Setup SQL ###

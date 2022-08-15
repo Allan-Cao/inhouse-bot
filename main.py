@@ -17,12 +17,7 @@ RIOT_API = os.getenv('RIOT_API')
 cass.set_riot_api_key(RIOT_API)
 
 ### Set Global Variables
-# top = discord.SelectOption(label="Top", value="Top")
-# jungle = discord.SelectOption(label="Jungle", value="Jungle")
-# mid = discord.SelectOption(label="Mid", value="Mid")
-# adc = discord.SelectOption(label="ADC", value="ADC")
-# support = discord.SelectOption(label="Support",value="Support")
-# role_select = discord.SelectMenu(1,1,[top,jungle,mid,adc,support])
+
 global_roles = ["top","jungle","mid","support","adc"]
 sql_role_map = {
     "top": "Top",
@@ -38,6 +33,11 @@ async def on_ready():
     await bot.change_presence(
         status=discord.Status.online,
         activity=discord.Game("Managing Inhouse Queues"))
+
+############################################# Import Cogs ##########################################################
+
+bot.load_extension('cogs.info_cog')
+bot.load_extension('cogs.admin_cog')
 
 ############################################# User Registration ##########################################################
 registration = bot.create_group("register", "Inhouse queue system")
@@ -105,27 +105,6 @@ async def leave(ctx):
     discord_id = ctx.user.id
     remove_from_queue_id(discord_id)
     await ctx.respond("You have been removed from the queue.")
-
-@bot.slash_command(name = "profile", description = "Your profile")
-async def profile(ctx: discord.ApplicationContext):
-    discord_id = ctx.user.id
-    player_info = lookup_by_id(discord_id)
-    if player_info == None:
-        await ctx.respond(f"Your user profile could not be found. Are you sure you are registered?")
-        return
-    else:
-        embed = format_playercard_embed(player_info)
-        await ctx.respond(embed=embed)
-
-@bot.slash_command(name = "search", description = "Lookup user")
-async def search(ctx: discord.ApplicationContext, ign: str):
-    player_info = lookup_by_ign(ign)
-    if player_info == None:
-        await ctx.respond(f"User with the IGN {ign} could not be found")
-        return
-    else:
-        embed = format_playercard_embed(player_info)
-        await ctx.respond(embed=embed)
 ############################## READY CHECK COMMANDS ############################## 
 
 
