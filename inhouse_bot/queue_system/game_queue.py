@@ -58,7 +58,7 @@ class GameQueue():
         return {role: [player for player in self.lobby_players if player[2] == role] for role in secondary_roles}
     @property
     def player_ids_list(self):
-        return [qp[1] for qp in self.queue_players]
+        return [qp[1] for qp in self.lobby_players]
 
     def __len__(self):
         return len(self.queue_players)
