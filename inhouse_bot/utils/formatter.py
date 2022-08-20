@@ -15,6 +15,7 @@ sql_role_map = {
 }
 
 def ping_user_by_id(id, ign):
+    # return "<@!" + str(id) + ">"
     if id == 0:
         return ign
     else:

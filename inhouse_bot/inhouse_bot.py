@@ -1,12 +1,11 @@
 import discord
 from discord.ext import commands
+import os
 from dotenv import load_dotenv
 load_dotenv() # Loads .env variables
-import os
 
 intents = discord.Intents.default()
 test_servers = [821109702162907158]
-
 
 class InhouseBot(commands.Bot):
     def __init__(self):
@@ -23,10 +22,9 @@ class InhouseBot(commands.Bot):
 
     async def on_ready(self):
         print(f"We have logged in as {self.user.name}")
-        await self.change_presence(
-            status=discord.Status.online,
-            activity=discord.Game("Managing Inhouse Queues"),
-        )
+        print(f"We are in {len(self.guilds)} guilds")
+        # change discord status to playing "Inhouse Queues"
+        await self.change_presence(activity=discord.Game(name="Inhouse Queues"))
 
     def run(self):
         super().run(os.getenv("SERA_TOKEN"))

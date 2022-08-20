@@ -36,6 +36,7 @@ get_role_queue_query = "SELECT * FROM queue WHERE primary_role = %s OR secondary
 get_role_sorted_query = "SELECT * from queue WHERE primary_role = %s ORDER BY created_at;"
 reset_ready_check_id_query = "UPDATE queue SET ready_check = None WHERE ready_check_id = %s"
 update_ready_check_id_query = "UPDATE queue SET ready_check_id = %s WHERE id = %s"
+
 ### Setup SQL
 import mysql.connector
 from mysql.connector import Error
@@ -51,8 +52,7 @@ try:
         cursor = connection.cursor()
 except Error as e:
     print("Error while connecting to MySQL", e)
-
-def check_lobby_made(ctx):
+def check_lobby_made():
     with connection.cursor() as cursor:
         lobby_users = []
         for role in ["Top", "Jungle", "Mid", "ADC", "Support"]:

@@ -33,15 +33,13 @@ class info_cog(commands.Cog):
     async def profile(self, ctx: discord.ApplicationContext):
         discord_id = ctx.user.id
         player_info = lookup_by_id(discord_id)
-        if player_info == None:
-            await ctx.respond(
-                f"Your user profile could not be found. Are you sure you are registered?"
-            )
-            return
-        else:
+        # check if player_info is not None, if it is not none, format the embed and send it to the user
+        if player_info != None:
             embed = self.format_playercard_embed(player_info)
             await ctx.respond(embed=embed)
-
+        else:
+            await ctx.respond("You are not in the system")
+        
     @commands.slash_command(name="search", description="Lookup user")
     async def search(self, ctx: discord.ApplicationContext, ign: str):
         player_info = lookup_by_ign(ign)

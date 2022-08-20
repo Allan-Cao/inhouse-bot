@@ -11,6 +11,13 @@ class QueuePlayer():
             role = player_queue_data[2]
             queue_time = player_queue_data[7]
             in_ready_check = player_queue_data[5]
-            is_ready = player_queue_data[6]
+            is_ready = player_queue_data[6]\
+    # Add player to queue
+    def add_to_queue(self, role):
+        pass
+    # Remove player from queue
+    def remove_from_queue(self):
+        pass
+    
     def __str__(self):
         return f"{self.player.name} - {self.role}"

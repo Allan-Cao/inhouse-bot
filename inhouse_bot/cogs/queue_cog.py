@@ -13,9 +13,9 @@ class queue_cog(commands.Cog):
         self.bot = bot
     async def matchmaking_logic(self, ctx):
         queue = GameQueue()
-        if len(queue.queue_players) == 10:
-            embed = queue.get_embed()
-            player_ping = queue.ping_queue()
+        if queue.game_id != None:
+            embed = queue.make_queue_embed()
+            player_ping = "Test Message"
             ready_check_message = await ctx.send(content=player_ping, embed=embed, delete_after=60 * 15)
             
             try:

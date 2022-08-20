@@ -16,7 +16,7 @@ async def checkmark_validation(
     await message.add_reaction("❌")
 
     def check(received_reaction: discord.Reaction, sending_user: discord.User):
-        # This check is simply used to see if a player in the game responded to the message.
+        # Check if the reaction is a checkmark and if the user is in the validating_players_ids list
         return (
             received_reaction.message.id == message.id
             and sending_user.id in validating_players_ids
@@ -34,10 +34,12 @@ async def checkmark_validation(
 
             # A player accepted, we keep him in memory
             if str(reaction.emoji) == "✅":
+                print(f"{user.name} validated")
                 ids_of_players_who_validated.add(user.id)
 
             # A player cancels, we return it and will drop him
             elif str(reaction.emoji) == "❌":
+                print(f"{user.name} cancelled")
                 result, ids_to_drop = False, {user.id}
                 break
 
